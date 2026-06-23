@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Feature Flag System</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+    h1 { font-size: 24px; color: #1a1a2e; margin-bottom: 8px; }
+    p { color: #666; font-size: 14px; margin-bottom: 32px; }
+    .portal-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      margin: 12px 0;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .super-admin {
+      background: #1a73e8;
+      color: white;
+    }
+    .super-admin:hover { background: #1557b0; }
+    .admin {
+      background: #2e7d32;
+      color: white;
+    }
+    .admin:hover { background: #1b5e20; }
+    .user {
+      background: #f57c00;
+      color: white;
+    }
+    .user:hover { background: #e65100; }
+    .badge {
+      background: #e8f4fd;
+      color: #1a73e8;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    .icon { font-size: 20px; margin-right: 10px; }
+    .description {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">🚩 Feature Flag System</span>
+    <h1>Welcome!</h1>
+    <p>Select your portal to continue</p>
+
+    <a class="portal-btn super-admin" href="frontend/super-admin/index.html">
+      <span class="icon">🔐</span> Super Admin Portal
+      <div class="description">Manage organisations</div>
+    </a>
+
+    <a class="portal-btn admin" href="frontend/admin/index.html">
+      <span class="icon">👤</span> Admin Portal
+      <div class="description">Manage feature flags</div>
+    </a>
+
+    <a class="portal-btn user" href="frontend/user/index.html">
+      <span class="icon">👥</span> User Portal
+      <div class="description">Check feature status</div>
+    </a>
+  </div>
+</body>
+</html>

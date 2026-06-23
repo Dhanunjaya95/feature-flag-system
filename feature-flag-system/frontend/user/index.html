@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Feature Flag Checker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+    .badge {
+      background: #e8f4fd;
+      color: #1a73e8;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    h1 { font-size: 22px; color: #1a1a2e; margin-bottom: 6px; }
+    p.subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+    select, input {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 8px 0;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s;
+      background: white;
+      text-align: left;
+    }
+    select:focus, input:focus { border-color: #1a73e8; }
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+      background: #1a73e8;
+      color: white;
+      transition: all 0.3s;
+    }
+    .btn:hover { background: #1557b0; }
+    .result {
+      margin-top: 24px;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      display: none;
+    }
+    .result.enabled {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 2px solid #2e7d32;
+      display: block;
+    }
+    .result.disabled {
+      background: #ffebee;
+      color: #c62828;
+      border: 2px solid #ea4335;
+      display: block;
+    }
+    .result.notfound {
+      background: #fff8e1;
+      color: #f57f17;
+      border: 2px solid #fbc02d;
+      display: block;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 24px 0;
+    }
+    .flag-label {
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin: 8px 0 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <span class="badge">🚩 Feature Flag Checker</span>
+    <h1>Check Feature Status</h1>
+    <p class="subtitle">Select your organisation and enter a feature key to check if it's enabled</p>
+
+    <hr class="divider">
+
+    <p class="flag-label">Select Organisation</p>
+    <select id="orgSelect">
+      <option value="">Loading organisations...</option>
+    </select>
+
+    <p class="flag-label">Feature Key</p>
+    <input 
+      type="text" 
+      id="featureKey" 
+      placeholder="e.g. dark_mode, new_dashboard"
+    />
+
+    <button class="btn" onclick="checkFlag()">🔍 Check Feature</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:3000';
+
+    // Load organisations into dropdown
+    async function loadOrgs() {
+      try {
+        const res = await fetch(`${API}/organisations-public`);
+        const orgs = await res.json();
+        const select = document.getElementById('orgSelect');
+        select.innerHTML = '<option value="">Select your organisation</option>';
+        orgs.forEach(o => {
+          const option = document.createElement('option');
+          option.value = o.id;
+          option.textContent = o.name;
+          select.appendChild(option);
+        });
+      } catch(e) {
+        document.getElementById('orgSelect').innerHTML = 
+          '<option value="">Could not load organisations</option>';
+      }
+    }
+
+    async function checkFlag() {
+      const orgId = document.getElementById('orgSelect').value;
+      const featureKey = document.getElementById('featureKey').value.trim();
+      const resultDiv = document.getElementById('result');
+
+      if (!orgId) {
+        resultDiv.className = 'result notfound';
+        resultDiv.innerHTML = '⚠️ Please select an organisation!';
+        return;
+      }
+
+      if (!featureKey) {
+        resultDiv.className = 'result notfound';
+        resultDiv.innerHTML = '⚠️ Please enter a feature key!';
+        return;
+      }
+
+      const res = await fetch(`${API}/check-flag?key=${featureKey}&org_id=${orgId}`);
+      const data = await res.json();
+
+      if (data.message === 'Flag not found') {
+        resultDiv.className = 'result notfound';
+        resultDiv.innerHTML = '🔍 Feature key not found for this organisation!';
+      } else if (data.enabled) {
+        resultDiv.className = 'result enabled';
+        resultDiv.innerHTML = '✅ Feature is ENABLED for your organisation!';
+      } else {
+        resultDiv.className = 'result disabled';
+        resultDiv.innerHTML = '❌ Feature is DISABLED for your organisation!';
+      }
+    }
+
+    loadOrgs();
+  </script>
+
+</body>
+</html>
